@@ -1,6 +1,13 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+void wypisz(int A[], int n){
+    for(int i=0; i<n; i++){
+        cout << A[i] << " ";
+    }
+    cout << "\n";
+}
+
 void heapify(int A[], int n, int i){
     int d = i;
     int l = 2 * i + 1;
@@ -55,11 +62,11 @@ void mod_heapify(int A[], int n, int i) {
     }
 }
 
-void mod_heap_sort(int A[], int n) {
-    for(int i=(n - 2)/3; i>=0; i--) {
+void mod_heap_sort(int A[], int n){
+    for(int i=(n - 2)/3; i>=0; i--){
         mod_heapify(A, n, i);
     }
-    for(int i=n - 1; i>0; i--) {
+    for(int i=n - 1; i>0; i--){
         int t = A[0];
         A[0] = A[i];
         A[i] = t;
@@ -68,5 +75,18 @@ void mod_heap_sort(int A[], int n) {
 }
 
 int main(){
+    int tab[] = {1, 2, 4, 3, 5, 6, 77, 11, 12, 13, 33, 76, 67, 1, 1, 0, 0, 5, 7, 66, 66, 33};
+    int n = sizeof(tab) / sizeof(tab[0]);
 
+    int temp_tab[n];
+
+    copy(tab, tab + n, temp_tab);
+    heap_sort(temp_tab, n);
+    wypisz(temp_tab, n);
+
+    copy(tab, tab + n, temp_tab);
+    mod_heap_sort(temp_tab, n);
+    wypisz(temp_tab, n);
+
+    return 0;
 }

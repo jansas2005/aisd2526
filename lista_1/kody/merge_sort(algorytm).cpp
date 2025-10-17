@@ -1,11 +1,18 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+void wypisz(int A[], int n){
+    for(int i=0; i<n; i++){
+        cout << A[i] << " ";
+    }
+    cout << "\n";
+}
+
 void merge_s(int A[], int p, int s, int k){
     int r_L = s - p + 1;
     int r_P = k - s;
 
-    int L[r_P];
+    int L[r_L];
     int P[r_P];
 
     for(int i=0; i<r_L; i++){
@@ -149,5 +156,18 @@ void mod_merge_sort(int A[], int p, int k){
 }
 
 int main(){
+    int tab[] = {1, 2, 4, 3, 5, 6, 77, 11, 12, 13, 33, 76, 67, 1, 1, 0, 0, 5, 7, 66, 66, 33};
+    int n = sizeof(tab) / sizeof(tab[0]);
 
+    int temp_tab[n];
+
+    copy(tab, tab + n, temp_tab);
+    merge_sort(temp_tab, 0, n-1);
+    wypisz(temp_tab, n);
+
+    copy(tab, tab + n, temp_tab);
+    mod_merge_sort(temp_tab, 0, n-1);
+    wypisz(temp_tab, n);
+
+    return 0;
 }
