@@ -1,0 +1,269 @@
+\documentclass[12pt, a4paper]{article} % Większa czcionka, format A4
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[polish]{babel}
+\usepackage{amsmath}
+\usepackage{listings}
+\usepackage{geometry}
+\usepackage{graphicx} % Do skalowania tabeli, jeśli potrzebne
+\usepackage{booktabs} % Lepsze linie w tabeli
+\usepackage{float} % Lepsze pozycjonowanie tabel i listingów
+\usepackage{underscore} % Poprawne działanie podkreślnika w tekście
+\usepackage{xcolor} % Dla kolorów w listings
+
+\geometry{a4paper, margin=1in} % Marginesy
+
+% --- Konfiguracja listings ---
+\lstset{
+	language=C++,
+	basicstyle=\ttfamily\small, % Styl czcionki
+	keywordstyle=\color{blue}, % Kolor słów kluczowych C++
+	commentstyle=\color{green!60!black}, % Kolor komentarzy
+	stringstyle=\color{red}, % Kolor stringów
+	numbers=left, % Numerowanie linii
+	numberstyle=\tiny\color{gray}, % Styl numerów
+	stepnumber=1, % Numeruj co 1 linię
+	numbersep=5pt, % Odstęp numerów od kodu
+	backgroundcolor=\color{gray!10}, % Lekkie tło dla kodu
+	showspaces=false, % Nie pokazuj spacji
+	showstringspaces=false, % Nie pokazuj spacji w stringach
+	showtabs=false, % Nie pokazuj tabulatorów
+	frame=single, % Pojedyncza ramka
+	rulecolor=\color{black}, % Kolor ramki
+	tabsize=2, % Rozmiar tabulatora
+	captionpos=b, % Podpis pod kodem
+	breaklines=true, % Automatyczne łamanie linii
+	breakatwhitespace=true, % Łam linie tylko na białych znakach
+	inputencoding=utf8, % Kodowanie wejściowe
+	escapeinside={\%*}{*)}, % Możliwość używania poleceń LaTeX w komentarzach
+	morekeywords={*, long long, int, void, if, else, for, while, return, using, namespace, std, cout, copy, swap, endl, vector, auto, high_resolution_clock, time_point, duration, milli}, % Dodatkowe słowa kluczowe
+	literate={ą}{{\k{a}}}1 {ę}{{\k{e}}}1 {ć}{{\'c}}1 {ł}{{\l{}}}1 {ń}{{\'n}}1 {ó}{{\'o}}1 {ś}{{\'s}}1 {ź}{{\'z}}1 {ż}{{\.z}}1
+	{Ą}{{\k{A}}}1 {Ę}{{\k{E}}}1 {Ć}{{\'C}}1 {Ł}{{\L{}}}1 {Ń}{{\'N}}1 {Ó}{{\'O}}1 {Ś}{{\'S}}1 {Ź}{{\'Z}}1 {Ż}{{\.Z}}1
+}
+
+\usepackage{hyperref}
+
+\title{Analiza Algorytmów Sortowania}
+\author{Jan Sas 287299}
+\date{\today}
+
+\begin{document}
+	\maketitle
+	\newpage
+	
+	\section*{Opis Algorytmów i Wyników}
+	
+	\subsection*{1. Insertion Sort (Sortowanie przez wstawianie)}
+	\textbf{Zasada działania:} Przechodzi przez tablicę, biorąc każdy element i wstawiając go na właściwe miejsce w już posortowanej części po lewej stronie.
+	
+	\textbf{Modyfikacja:} Przetwarza elementy parami. Porównuje parę, a następnie wstawia najpierw większy, potem mniejszy element do posortowanej części.
+	
+	\textbf{Fragment kodu modyfikacji:}
+	\begin{lstlisting}[caption={Fragment modyfikacji Insertion Sort - obsługa pary}, label={lst:insertmod}]
+		// ... wewnątrz pętli for (i=1; i<n - 1; i+=2) ...
+		int m_k, d_k; // mniejszy_klucz, duzy_klucz
+		porownania++;
+		if(A[i] > A[i+1]){ // Porownanie pary
+			d_k = A[i]; m_k = A[i+1];
+		} else {
+			m_k = A[i]; d_k = A[i+1];
+		}
+		przypisania+=2; int j = i - 1;
+		
+		// Wstawianie wiekszego klucza (d_k)
+		while(j >= 0){
+			porownania++;
+			if(A[j] > d_k){
+				A[j + 2] = A[j]; j--; przypisania++;
+			} else { break; }
+		}
+		A[j + 2] = d_k; przypisania++;
+		
+		// Wstawianie mniejszego klucza (m_k)
+		while(j >= 0){
+			porownania++;
+			if (A[j] > m_k) {
+				A[j + 1] = A[j]; j--; przypisania++;
+			} else { break; }
+		}
+		A[j + 1] = m_k; przypisania++;
+		// ...
+	\end{lstlisting}
+	
+	\newpage
+	\subsection*{2. Merge Sort (Sortowanie przez scalanie)}
+	\textbf{Zasada działania:} Dzieli tablicę na pół, rekurencyjnie sortuje połówki, a następnie scala je w jedną posortowaną całość.
+	
+	\textbf{Modyfikacja:} Dzieli tablicę na \textbf{trzy} części, rekurencyjnie je sortuje, a potem scala wszystkie trzy naraz.
+	
+	\textbf{Fragment kodu modyfikacji:}
+	\begin{lstlisting}[caption={Fragment modyfikacji Merge Sort - scalanie 3 części}, label={lst:mergemod}]
+		void mod_merge_s(int A[], int p, int s1, int s2, int k, /* ...liczniki... */){
+			// ... (kopiowanie do L, S, P) ...
+			int i = 0, j = 0, l = 0, w = p;
+			while(i < r_L && j < r_S && l < r_P){ // Glowna petla scalajaca 3
+				przypisania++; porownania++;
+				if(L[i] <= S[j]){
+					porownania++;
+					if(L[i] <= P[l]){ A[w++] = L[i++]; }
+					else{ A[w++] = P[l++]; }
+				} else {
+					porownania++;
+					if(S[j] <= P[l]){ A[w++] = S[j++]; }
+					else{ A[w++] = P[l++]; }
+				}
+			}
+			// ... (petle czyszczace dla pozostalych 2 lub 1 tablicy) ...
+		}
+		
+		void mod_merge_sort(int A[], int p, int k, /* ...liczniki... */){
+			if (k - p < 2) { /* ... warunek bazowy ... */ return; }
+			int s1 = p + (k - p) / 3; int s2 = p + 2 * (k - p) / 3; // Dwa punkty podzialu
+			mod_merge_sort(A, p, s1, /*...*/);
+			mod_merge_sort(A, s1 + 1, s2, /*...*/);
+			mod_merge_sort(A, s2 + 1, k, /*...*/);
+			mod_merge_s(A, p, s1, s2, k, /*...*/); // Scalanie trzech
+		}
+	\end{lstlisting}
+	
+	\newpage
+	\subsection*{3. Heap Sort (Sortowanie przez kopcowanie)}
+	\textbf{Zasada działania:} Buduje z tablicy strukturę kopca (najczęściej binarnego typu max-heap), a następnie wielokrotnie usuwa największy element (korzeń), umieszcza go na końcu i naprawia kopiec.
+	
+	\textbf{Modyfikacja:} Używa \textbf{kopca ternarnego} (trójkowego), gdzie rodzic ma do trojga dzieci. Wymaga to innych wzorów na indeksy dzieci i zmodyfikowanej funkcji \texttt{heapify}.
+	
+	\textbf{Fragment kodu modyfikacji:}
+	\begin{lstlisting}[caption={Fragment modyfikacji Heap Sort - kopiec ternarny}, label={lst:heapmod}]
+		void mod_heapify(int A[], int n, int i, /* ...liczniki... */) {
+			int d = i;
+			int c1 = 3 * i + 1; int c2 = 3 * i + 2; int c3 = 3 * i + 3; // Indeksy 3 dzieci
+			
+			// Znajdowanie najwiekszego sposrod 4 elementow (rodzic + 3 dzieci)
+			if(c1 < n){ porownania++; if(A[c1] > A[d]){ d = c1; } }
+			if(c2 < n){ porownania++; if(A[c2] > A[d]){ d = c2; } }
+			if(c3 < n){ porownania++; if(A[c3] > A[d]){ d = c3; } }
+			
+			if(d != i){
+				swap(A[i], A[d]); przypisania += 3;
+				mod_heapify(A, n, d, /*...*/);
+			}
+		}
+		
+		void mod_heap_sort(int A[], int n, /* ...liczniki... */) {
+			// ... (zerowanie licznikow) ...
+			// Budowanie kopca ternarnego - inny indeks startowy
+			for(int i=(n - 2)/3; i>=0; i--) { mod_heapify(A, n, i, /*...*/); }
+			// Petla sortujaca
+			for(int i=n - 1; i>0; i--) {
+				swap(A[0], A[i]); przypisania += 3;
+				mod_heapify(A, i, 0, /*...*/);
+			}
+		}
+	\end{lstlisting}
+	
+	\newpage
+	\subsection*{4. Funkcja pomocnicza \texttt{wypisz}}
+	Prosta funkcja iterująca przez tablicę i wypisująca jej elementy na konsolę, oddzielone spacjami.
+	
+	\begin{lstlisting}[caption={Funkcja wypisz}, label={lst:wypisz}]
+		void wypisz(int A[], int n){
+			for(int i=0; i<n; i++){
+				cout << A[i] << " ";
+			}
+			cout << "\n";
+		}
+	\end{lstlisting}
+	
+	\newpage
+	\subsection*{5. Funkcja testująca \texttt{main}}
+	Główna funkcja programu odpowiedzialna za przeprowadzenie testów i pomiar wydajności. Jej działanie obejmuje: zdefiniowanie testowanych rozmiarów tablic (\texttt{n}); iterację przez te rozmiary; dla każdego \texttt{n} dynamiczne alokowanie pamięci na tablicę oryginalną i tymczasową; wypełnienie tablicy oryginalnej losowymi danymi; następnie dla każdego z sześciu algorytmów: skopiowanie danych do tablicy tymczasowej, zmierzenie czasu wykonania (za pomocą \texttt{<chrono>}), wywołanie funkcji sortującej (przekazując referencje do liczników), obliczenie i wypisanie czasu oraz liczby porównań i przypisań; na koniec zwolnienie zaalokowanej dynamicznie pamięci. Użycie \texttt{copy} przed każdym testem gwarantuje, że algorytmy działają na identycznych danych wejściowych.
+	
+	\begin{lstlisting}[caption={Fragment funkcji main - testowanie i pomiar czasu}, label={lst:maintest}]
+	
+		using namespace std::chrono;
+		
+		int main(){
+			vector<int> n_values = {100, 1000, 10000, 50000};
+			// ... (ustawienia generatora) ...
+			cout << fixed << setprecision(3);
+			
+			for (int n : n_values) {
+				// ... (alokacja, generowanie danych) ...
+				
+				// Przyklad testu dla Insertion Sort
+				copy(original_data, original_data + n, temp_data);
+				auto start = high_resolution_clock::now(); // Czas start
+				insertion_sort(n, temp_data, porownania, przypisania);
+				auto end = high_resolution_clock::now();   // Czas stop
+				duration<double, milli> elapsed_ms = end - start; // Obliczenie roznicy
+				
+				cout << "Insertion Sort: \t" << porownania << " por, "
+				<< przypisania << " przy, " << elapsed_ms.count() << " ms" << endl;
+				
+				// ... (testy dla reszty algorytmow) ...
+				
+				delete[] original_data; // Zwolnienie pamieci
+				delete[] temp_data;
+			}
+			return 0;
+		}
+	\end{lstlisting}
+	
+	\newpage
+	\subsection*{6. Tabela Wyników}
+	Poniższa tabela przedstawia zebrane wyniki liczby porównań kluczy, przypisań kluczy oraz czasu wykonania (w milisekundach) dla poszczególnych algorytmów i różnych rozmiarów danych wejściowych (\texttt{n}).
+	
+	\begin{table}[H]
+		\centering
+		\caption{Porównanie wydajności algorytmów sortowania}
+		\label{tab:wyniki}
+		\resizebox{\textwidth}{!}{%
+			\begin{tabular}{llrrr}
+				\toprule
+				Rozmiar (n) & Algorytm             & Porównania   & Przypisania  & Czas (ms) \\
+				\midrule
+				\textbf{100} & Insertion Sort       &        2,582 &        2,685 &     0.016 \\
+				& Mod Insertion Sort   &        1,884 &        1,939 &     0.012 \\
+				& Merge Sort           &          544 &        1,344 &     0.018 \\
+				& Mod Merge Sort       &          668 &          876 &     0.018 \\
+				& Heap Sort            &        1,030 &        1,758 &     0.017 \\
+				& Mod Heap Sort        &        1,021 &        1,275 &     0.018 \\
+				\midrule
+				\textbf{1,000} & Insertion Sort       &      244,861 &      245,862 &     1.293 \\
+				& Mod Insertion Sort   &      165,917 &      166,419 &     0.915 \\
+				& Merge Sort           &        8,702 &       19,952 &     0.199 \\
+				& Mod Merge Sort       &       10,756 &       13,084 &     0.174 \\
+				& Heap Sort            &       16,860 &       27,261 &     0.251 \\
+				& Mod Heap Sort        &       16,404 &       18,810 &     0.222 \\
+				\midrule
+				\textbf{10,000} & Insertion Sort       &   24,758,602 &   24,768,608 &   130.506 \\
+				& Mod Insertion Sort   &   16,531,497 &   16,536,504 &    84.347 \\
+				& Merge Sort           &      120,437 &      267,232 &     2.962 \\
+				& Mod Merge Sort       &      149,280 &      173,756 &     2.037 \\
+				& Heap Sort            &      235,448 &      372,786 &     3.244 \\
+				& Mod Heap Sort        &      226,658 &      250,617 &     3.119 \\
+				\midrule
+				\textbf{50,000} & Insertion Sort       &  624,462,897 &  624,512,907 &  3510.284 \\
+				& Mod Insertion Sort   &  415,981,205 &  416,006,216 &  2300.423 \\
+				& Merge Sort           &      718,272 &    1,568,928 &    14.800 \\
+				& Mod Merge Sort       &      893,789 &    1,000,000 &    11.351 \\
+				& Heap Sort            &    1,409,992 &    2,213,046 &    21.060 \\
+				& Mod Heap Sort        &    1,359,081 &    1,478,568 &    19.292 \\
+				\bottomrule
+			\end{tabular}%
+		} % Koniec resizebox
+	\end{table}
+	
+	\subsection*{7. Omówienie Wyników}
+	Tabela potwierdza, że algorytmy $O(n \log n)$ (Merge, Heap Sort) są znacznie wydajniejsze dla dużych $n$ niż $O(n^2)$ (Insertion Sort). Modyfikacje wprowadzają kompromisy: Mod Insertion Sort jest szybszy; Mod Merge Sort wykonuje więcej porównań, ale mniej przypisań (i działa szybciej dla dużych $n$); Mod Heap Sort jest nieznacznie szybszy. Zmodyfikowany Merge Sort okazał się najszybszy w testach dla $n \ge 10000$.
+	
+	\newpage
+	\subsection*{8. Wnioski}
+	\begin{itemize}
+		\item Złożoność asymptotyczna jest kluczowa dla dużych danych.
+		\item Modyfikacje algorytmów mogą optymalizować liczbę porównań lub przypisań, co wpływa na rzeczywisty czas wykonania. Koszt operacji pamięci jest istotny.
+		\item W przeprowadzonych testach zmodyfikowany Merge Sort (3-częściowy) okazał się najszybszy dla dużych zbiorów danych, mimo większej liczby porównań na krok.
+		\item Wybór algorytmu zależy od rozmiaru danych i priorytetów (czas vs. liczba konkretnych operacji).
+	\end{itemize}
+	
+\end{document}
